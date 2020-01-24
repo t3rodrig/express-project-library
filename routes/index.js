@@ -17,6 +17,19 @@ router.get('/books', (req, res, next) => {
     .catch(err => console.log('Error while getting the books from DB:', err));
 });
 
+router.get('/books/add', (req, res, next) => {
+  res.render('book-add');
+});
+
+router.post('/books/add', (req, res, next) => {
+  const data = { title, author, description, rating } = req.body;
+  Book.create(data)
+    .then(book => {
+      res.redirect('/books');
+    })
+    .catch(err => console.log(err));
+});
+
 router.get('/books/:bookId', (req, res, next) => {
   let bookId = req.params.bookId;
 
