@@ -11,10 +11,20 @@ router.get('/', (req, res, next) => {
 router.get('/books', (req, res, next) => {
   Book.find()
     .then(books => {
-      console.log('Retrived books from DB:', books);
+      // console.log('Retrived books from DB:', books);
       res.render('books', {books});
     })
     .catch(err => console.log('Error while getting the books from DB:', err));
+});
+
+router.get('/books/:bookId', (req, res, next) => {
+  let bookId = req.params.bookId;
+
+  Book.findById(bookId)
+    .then(book => {
+      res.render('book-details', {book});
+    })
+    .catch(err => console.log('Error while retrieving book details: ', err));
 });
 
 module.exports = router;
