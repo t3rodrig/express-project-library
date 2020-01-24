@@ -30,6 +30,12 @@ router.post('/books/add', (req, res, next) => {
     .catch(err => console.log(err));
 });
 
+router.get('/books/edit', (req, res, next) => {
+  let bookId = req.query.bookId;
+
+  res.render('book-edit');
+});
+
 router.get('/books/:bookId', (req, res, next) => {
   let bookId = req.params.bookId;
 
