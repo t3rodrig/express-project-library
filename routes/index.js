@@ -33,7 +33,23 @@ router.post('/books/add', (req, res, next) => {
 router.get('/books/edit', (req, res, next) => {
   let bookId = req.query.bookId;
 
-  res.render('book-edit');
+  Book.findById(bookId)
+    .then(book => {
+      res.render('book-edit', {book});
+    })
+    .catch(err => console.log('Error while retrieving book: ', err));
+});
+
+router.post('/books/edit', (req, res, next) => {
+  let bookId = req.query.bookId;
+  const data = { title, author, description, rating } = req.body;
+
+  Book.findByIdAndUpdate(bookId, {$set: data}, { new: true })
+    .then(book => {
+      res.redirect('/books');
+    })
+    .catch(err => console.log('Error while retrieving book: ', err));
+  
 });
 
 router.get('/books/:bookId', (req, res, next) => {
