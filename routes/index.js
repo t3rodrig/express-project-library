@@ -65,7 +65,7 @@ router.get('/books/:bookId', (req, res, next) => {
         return res.status(404).render('not-found');
       }
       res.render('book-details', {book});
-      console.log(book);
+      // console.log(book);
     })
     .catch(err => console.log('Error while retrieving book details: ', err));
 });

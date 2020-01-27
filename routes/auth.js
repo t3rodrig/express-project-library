@@ -9,11 +9,11 @@ const saltRounds = 10;
 
 const router = express.Router();
 
-router.get("/", (req, res, next) => {
+router.get("/signup", (req, res, next) => {
   res.render("auth/signup");
 });
 
-router.post("/", (req, res, next) => {
+router.post("/signup", (req, res, next) => {
   const { username, password } = req.body;
   const salt = bcrypt.genSaltSync(saltRounds);
   const hashPass = bcrypt.hashSync(password, salt);
@@ -46,6 +46,43 @@ router.post("/", (req, res, next) => {
   })
   .catch(err => next(err));
 
+
+});
+
+router.get('/login', (req, res, next) => {
+  res.render('auth/login');
+});
+
+router.post('/login', (req, res, next) => {
+  const { username, password } = req.body;
+
+  if(!username || !password){
+    res.render("auth/login", {
+      errorMessage: "Indicate a username and a password to login."
+    });
+    return;
+  }
+
+  User.findOne({username})
+  .then(user => {
+    if (!user){
+      res.render('auth/login', {
+        errorMessage: "The username doesn't exist."
+      });
+      return;
+    }
+
+    if (bcrypt.compareSync(password, user.password)){
+      // Save the login in the session
+      req.session.currentUser = user;
+      res.redirect('/');
+    } else {
+      res.render('auth/login', {
+        errorMessage: "Incorrect password"
+      });
+    }
+  })
+  .catch(err => next(err));
 
 });
 

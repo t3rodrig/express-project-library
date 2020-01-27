@@ -9,9 +9,15 @@ const mongoose     = require('mongoose');
 const logger       = require('morgan');
 const path         = require('path');
 
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
+
 
 mongoose
-  .connect('mongodb://localhost/library-project', {useNewUrlParser: true})
+  .connect('mongodb://localhost/library-project', {
+    useUnifiedTopology: true, 
+    useNewUrlParser: true
+  })
   .then(x => {
     console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`);
   })
@@ -29,6 +35,17 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+app.use(session({
+  secret: 'basic-auth-secret',
+  cookie: {maxAge: 60000},
+  store: new MongoStore({
+    mongooseConnection: mongoose.connection,
+    ttl: 24 * 60 *60 // 1 day
+  }),
+  resave: true,  // express-session deprecated pass resave option
+  saveUninitialized: true  // express-session deprecated pass saveUninitialized option
+}));
 
 // Express View engine setup
 
@@ -50,12 +67,18 @@ app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
 app.locals.title = 'Express - Generated with IronGenerator';
 
 
+const auth = require('./routes/auth');
+app.use("/", auth);
 
 const index = require('./routes/index');
 app.use('/', index);
 
-const signup = require('./routes/auth');
-app.use("/signup", signup);
+app.use('/', require('./routes/site-routes'));
+
+// const signup = require('./routes/auth');
+// app.use("/signup", signup);
+
+
 
 
 module.exports = app;
